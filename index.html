@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detailed Thought — Digital Media Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1117;
+    --off: #F5F2EC;
+    --teal: #00897B;
+    --gold: #C9A84C;
+    --grey: #6B7280;
+    --light-grey: #E5E0D8;
+    --text: #1A1A2E;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--off);
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.4s ease, width 0.3s, height 0.3s, border-color 0.3s;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 28px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    mix-blend-mode: normal;
+  }
+  nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 48px; right: 48px;
+    height: 1px;
+    background: rgba(245,242,236,0.08);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--off);
+    text-decoration: none;
+  }
+  .logo span { color: var(--gold); }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: -20px;
+    transform: translateY(-50%);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(120px, 18vw, 280px);
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(245,242,236,0.04);
+    line-height: 0.85;
+    pointer-events: none;
+    white-space: nowrap;
+    animation: drift 20s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translateY(-50%) translateX(0); }
+    to   { transform: translateY(-52%) translateX(20px); }
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.3s forwards;
+  }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 6.5vw, 96px);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    max-width: 900px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.5s forwards;
+  }
+  .hero-headline em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    margin-top: 40px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(245,242,236,0.55);
+    max-width: 500px;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.7s forwards;
+  }
+
+  .hero-cta {
+    margin-top: 52px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.9s forwards;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover::after { opacity: 0.1; }
+  .btn-primary:hover { transform: translateY(-2px); }
+
+  .btn-ghost {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-ghost:hover { color: var(--off); }
+  .btn-ghost::after { content: '→'; }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 80px;
+    right: 48px;
+    writing-mode: vertical-rl;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.25);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards;
+  }
+  .hero-scroll::before {
+    content: '';
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, rgba(245,242,236,0.25));
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0%,100% { transform: scaleY(1); opacity: 0.5; }
+    50% { transform: scaleY(0.5); opacity: 1; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* TICKER */
+  .ticker {
+    background: var(--gold);
+    padding: 14px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-inner {
+    display: inline-flex;
+    animation: ticker 25s linear infinite;
+    gap: 0;
+  }
+  .ticker-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--navy);
+    font-weight: 500;
+    padding: 0 48px;
+  }
+  .ticker-item::after {
+    content: '·';
+    margin-left: 48px;
+    opacity: 0.4;
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ABOUT */
+  section { padding: 120px 48px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--teal);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .about-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 54px);
+    line-height: 1.15;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .about-headline em { font-style: italic; color: var(--gold); }
+
+  .about-body {
+    padding-top: 8px;
+  }
+  .about-body p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: rgba(245,242,236,0.6);
+    font-weight: 300;
+    margin-bottom: 24px;
+  }
+  .about-body p strong {
+    color: var(--off);
+    font-weight: 500;
+  }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(245,242,236,0.08);
+    margin-top: 80px;
+  }
+  .stat-box {
+    background: var(--navy);
+    padding: 40px 32px;
+    transition: background 0.2s;
+  }
+  .stat-box:hover { background: rgba(245,242,236,0.03); }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.4);
+  }
+
+  /* WHAT WE BUILD */
+  .what-section { background: var(--off); color: var(--text); }
+  .what-section .section-label { color: var(--teal); }
+  .what-section .section-label::before { background: var(--teal); }
+
+  .what-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4.5vw, 60px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 80px;
+    max-width: 700px;
+  }
+  .what-headline em { font-style: italic; color: var(--teal); }
+
+  .properties-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: rgba(26,26,46,0.1);
+  }
+
+  .property-card {
+    background: var(--off);
+    padding: 48px 40px;
+    transition: background 0.25s, transform 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .property-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--teal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .property-card:hover::before { transform: scaleX(1); }
+  .property-card:hover { background: white; transform: translateY(-4px); }
+
+  .property-icon {
+    font-size: 28px;
+    margin-bottom: 24px;
+    display: block;
+  }
+  .property-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+  .property-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .property-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(26,26,46,0.55);
+    font-weight: 300;
+  }
+
+  /* HOW WE WORK */
+  .how-section { border-top: 1px solid rgba(245,242,236,0.06); }
+
+  .how-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4.5vw, 60px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 80px;
+    max-width: 600px;
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: rgba(245,242,236,0.06);
+  }
+  .principle {
+    background: var(--navy);
+    padding: 52px 48px;
+    transition: background 0.2s;
+  }
+  .principle:hover { background: rgba(245,242,236,0.03); }
+  .principle-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+  .principle-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .principle-body {
+    font-size: 15px;
+    line-height: 1.75;
+    color: rgba(245,242,236,0.5);
+    font-weight: 300;
+  }
+
+  /* TEAM / JOIN */
+  .join-section {
+    background: linear-gradient(135deg, #0D1117 0%, #0a1628 100%);
+    border-top: 1px solid rgba(245,242,236,0.06);
+    text-align: center;
+    padding: 140px 48px;
+  }
+  .join-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  .join-label::before, .join-label::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--teal);
+  }
+  .join-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5.5vw, 72px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 28px;
+  }
+  .join-headline em { font-style: italic; color: var(--gold); }
+  .join-sub {
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(245,242,236,0.5);
+    max-width: 540px;
+    margin: 0 auto 52px;
+    font-weight: 300;
+  }
+
+  .roles-strip {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 52px;
+  }
+  .role-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 10px 20px;
+    border: 1px solid rgba(245,242,236,0.12);
+    color: rgba(245,242,236,0.5);
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .role-tag:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 52px 48px;
+    border-top: 1px solid rgba(245,242,236,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--off);
+  }
+  .footer-logo span { color: var(--gold); }
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(245,242,236,0.25);
+    text-transform: uppercase;
+  }
+  .footer-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .footer-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 24px 24px; }
+    .nav-links { display: none; }
+    section { padding: 80px 24px; }
+    .hero { padding: 0 24px 64px; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .about-stats { grid-template-columns: 1fr; }
+    .properties-grid { grid-template-columns: 1fr; }
+    .principles { grid-template-columns: 1fr; }
+    footer { flex-direction: column; align-items: flex-start; padding: 40px 24px; }
+    .hero-scroll { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Detailed<span>.</span>Thought</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#what">What We Build</a></li>
+    <li><a href="#how">How We Work</a></li>
+    <li><a href="#join">Join Us</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">Ideas</div>
+
+  <h1 class="hero-headline">
+    We build digital brands<br>
+    that make <em>complex ideas</em><br>
+    impossible to ignore.
+  </h1>
+  <p class="hero-sub">
+    Detailed Thought is a digital media company operating educational content brands across YouTube, web, and social — built for audiences who want depth without the noise.
+  </p>
+  <div class="hero-cta">
+    <a href="#what" class="btn-primary">See What We Build</a>
+    <a href="#join" class="btn-ghost">We're Hiring</a>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner">
+    <span class="ticker-item">YouTube Channels</span>
+    <span class="ticker-item">Editorial Websites</span>
+    <span class="ticker-item">Instagram Pages</span>
+    <span class="ticker-item">Facebook Communities</span>
+    <span class="ticker-item">Digital Brands</span>
+    <span class="ticker-item">Economics</span>
+    <span class="ticker-item">Geopolitics</span>
+    <span class="ticker-item">Business</span>
+    <span class="ticker-item">Technology</span>
+    <span class="ticker-item">Made in Mumbai</span>
+    <span class="ticker-item">YouTube Channels</span>
+    <span class="ticker-item">Editorial Websites</span>
+    <span class="ticker-item">Instagram Pages</span>
+    <span class="ticker-item">Facebook Communities</span>
+    <span class="ticker-item">Digital Brands</span>
+    <span class="ticker-item">Economics</span>
+    <span class="ticker-item">Geopolitics</span>
+    <span class="ticker-item">Business</span>
+    <span class="ticker-item">Technology</span>
+    <span class="ticker-item">Made in Mumbai</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About Us</div>
+  <div class="about-grid">
+    <div class="about-headline">
+      We turn <em>serious ideas</em> into media people actually want to consume.
+    </div>
+    <div class="about-body">
+      <p>
+        Detailed Thought is a Mumbai-based digital media company building educational content brands that people trust. We create and operate properties across <strong>YouTube, websites, Instagram, and Facebook</strong> — making complex ideas in economics, business, geopolitics, and technology simple, engaging, and accessible to a global audience.
+      </p>
+      <p>
+        Our model is built for scale. Each property we launch is designed to grow into a <strong>standalone brand</strong> with its own audience, voice, and revenue stream — think Dotdash Meredith, built for the digital-native generation.
+      </p>
+      <p>
+        We are a remote-first team that gives talented people <strong>real ownership over real output</strong> from Day 1. No busywork. No fake internships. Only work that ships.
+      </p>
+    </div>
+  </div>
+
+  <div class="about-stats">
+    <div class="stat-box">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Ideas worth building</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">3+</div>
+      <div class="stat-label">Platforms per brand</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Rule — clarity above all</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE BUILD -->
+<section id="what" class="what-section">
+  <div class="section-label" style="color:var(--teal);">What We Build</div>
+  <h2 class="what-headline">
+    Each brand we build is a <em>distinct voice</em> for a distinct audience.
+  </h2>
+
+  <div class="properties-grid">
+    <div class="property-card">
+      <span class="property-icon">▶</span>
+      <div class="property-type">YouTube Channels</div>
+      <div class="property-name">Animated Explainer Channels</div>
+      <div class="property-desc">Long-form animated content explaining economics, geopolitics, corporate history, and business — built to educate, entertain, and grow.</div>
+    </div>
+    <div class="property-card">
+      <span class="property-icon">◉</span>
+      <div class="property-type">Editorial Websites</div>
+      <div class="property-name">Vertical Content Hubs</div>
+      <div class="property-desc">SEO-driven editorial sites covering specific verticals — built for organic search authority and long-term audience ownership.</div>
+    </div>
+    <div class="property-card">
+      <span class="property-icon">◈</span>
+      <div class="property-type">Social Media</div>
+      <div class="property-name">Instagram & Facebook Brands</div>
+      <div class="property-desc">Visual-first social brands designed for sharing — short-form content that distils complex ideas into formats built for discovery.</div>
+    </div>
+    <div class="property-card">
+      <span class="property-icon">◎</span>
+      <div class="property-type">Multilingual</div>
+      <div class="property-name">Dubbed & Localised Content</div>
+      <div class="property-desc">Every property we build is designed for multilingual distribution — reaching Hindi, Tamil, and global audiences from a single production pipeline.</div>
+    </div>
+    <div class="property-card">
+      <span class="property-icon">◆</span>
+      <div class="property-type">Monetisation</div>
+      <div class="property-name">Ad Revenue & Sponsorships</div>
+      <div class="property-desc">We build audiences that advertisers want to reach. Each brand is designed around content categories with high CPM and strong sponsor demand.</div>
+    </div>
+    <div class="property-card">
+      <span class="property-icon">◇</span>
+      <div class="property-type">Pipeline</div>
+      <div class="property-name">Scalable Production System</div>
+      <div class="property-desc">Remote-first, async production built on clear SOPs — so quality and output scale without linear increases in cost or complexity.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW WE WORK -->
+<section id="how" class="how-section">
+  <div class="section-label">How We Work</div>
+  <h2 class="how-headline">
+    Four principles. No exceptions.
+  </h2>
+  <div class="principles">
+    <div class="principle">
+      <div class="principle-num">01</div>
+      <div class="principle-title">Clarity is the product</div>
+      <div class="principle-body">We do not publish anything that is confusing. If our audience has to re-read a sentence, we have failed. Every piece of content is a clarity exercise first.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">02</div>
+      <div class="principle-title">Depth earns trust</div>
+      <div class="principle-body">We do not chase trends or viral moments. We go deeper than the headline. Audiences who trust us stay with us — and that is worth more than any algorithm spike.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">03</div>
+      <div class="principle-title">Systems over heroics</div>
+      <div class="principle-body">Every brand we build runs on documented systems. Good content should not depend on one person having a good day. We build processes that make quality repeatable.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">04</div>
+      <div class="principle-title">Real work, real ownership</div>
+      <div class="principle-body">Everyone on our team works on things that ship. We do not have holding patterns or busywork roles. If you join us, your output is live and visible within your first week.</div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN -->
+<section id="join" class="join-section">
+  <div class="join-label">We Are Hiring</div>
+  <h2 class="join-headline">
+    If you love turning<br><em>complex into clear</em> —<br>let's talk.
+  </h2>
+  <p class="join-sub">
+    We are building a remote-first team of researchers, animators, and content operators. Paid internships with real ownership, flexible hours, and a certificate on completion.
+  </p>
+  <div class="roles-strip">
+    <div class="role-tag">Content Research Intern</div>
+    <div class="role-tag">Motion Designer & Video Editor</div>
+    <div class="role-tag">Upload Coordinator & Voiceover QA</div>
+  </div>
+  <a href="mailto:contact@detailedthought.com?subject=Internship%20Application%20%E2%80%94%20Detailed%20Thought&body=Hi%2C%0A%0AI%20am%20applying%20for%20the%20[Role%20Name]%20position%20at%20Detailed%20Thought.%0A%0AName%3A%20%0ARole%20Applying%20For%3A%20%0APortfolio%20%2F%20Work%20Samples%3A%20%0A%0AA%20brief%20note%20about%20myself%3A%0A" class="btn-primary" style="display:inline-flex;">
+    Apply Now
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Detailed<span>.</span>Thought</div>
+  <div class="footer-copy">© 2026 Detailed Thought · Proprietorship · Mumbai, India</div>
+  <ul class="footer-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#what">Work</a></li>
+    <li><a href="#join">Careers</a></li>
+    <li><a href="mailto:contact@detailedthought.com">Contact</a></li>
+  </ul>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .property-card, .principle, .stat-box').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.width = '60px';
+      ring.style.height = '60px';
+      ring.style.borderColor = 'rgba(201,168,76,0.8)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+      ring.style.borderColor = 'rgba(201,168,76,0.4)';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.property-card, .principle, .stat-box').forEach(el 
